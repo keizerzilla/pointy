@@ -2,7 +2,7 @@
 
 # pointy
 
-Pequena abstração que encapsula algumas classes Open3D para experimentação rápida com nuvens de pontos 3D.
+Pequena abstração que encapsula algumas classes Open3D para experimentação rápida com nuvens de pontos 3D. A implementação completa está contida num único arquivo: `pointy.py`.
 
 ## Dependências
 
