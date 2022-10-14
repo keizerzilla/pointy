@@ -1,8 +1,6 @@
-
-
 # pointy
 
-Pequena abstração que encapsula algumas classes Open3D para experimentação rápida com nuvens de pontos 3D. A implementação completa está contida num único arquivo: `pointy.py`.
+Pequena abstração que encapsula algumas classes da biblioteca Open3D para experimentação rápida com nuvens de pontos usando Python. A implementação completa está contida num único arquivo: `pointy.py`.
 
 ## Dependências
 
@@ -27,7 +25,9 @@ Dependendo do seu sistema operacional, o comando `pip3` pode estar indisponível
 
 ## Nuvens de teste
 
-Este repositório também traz um conjunto de pastas com nuvens de exemplo amplamente usadas na literatura, como o coelho e buddha da Stanford e o martelo que até hoje eu não sei de onde veio.
+Este repositório também traz um conjunto de pastas com nuvens de exemplo amplamente usadas na literatura, como o coelho e o buddha da Stanford e o martelo.  que até hoje eu não sei de onde veio.
+
+![Coelho particionado com k-médias em 5 grupos](assets/bun000_k5_01.png "Coelho particionado com k-médias em 5 grupos")
 
 ## Licença
 
