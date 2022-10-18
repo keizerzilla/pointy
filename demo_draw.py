@@ -6,7 +6,7 @@ if len(sys.argv) != 2:
     print("USO: python3 <[str]caminho_nuvem>")
     sys.exit(1)
 
-cloud = PointCloud(sys.argv[1])
+cloud = PointCloud(file_path=sys.argv[1])
 
 print(cloud)
 

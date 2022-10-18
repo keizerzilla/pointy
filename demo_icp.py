@@ -7,8 +7,8 @@ if len(sys.argv) != 3:
     print("USO: python3 <[str]caminho_fonte> <[str]caminho_alvo>")
     sys.exit(1)
 
-source = PointCloud(sys.argv[1])
-target = PointCloud(sys.argv[2])
+source = PointCloud(file_path=sys.argv[1])
+target = PointCloud(file_path=sys.argv[2])
 
 print(source)
 print(target)

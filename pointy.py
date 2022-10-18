@@ -3,26 +3,38 @@ import numpy as np
 import open3d as o3d
 from matplotlib import cm
 from sklearn.cluster import KMeans
+from sklearn.cluster import AgglomerativeClustering
 
 
 class PointCloud:
 
-    def __init__(self, file_path):
+    def __init__(self, file_path=None, xyz=None):
         """
         Construtor da classe PointCloud.
-        Recebe como parâmetro o caminho para um arquivo contendo uma nuvem.
+        Recebe como parâmetro o caminho para um arquivo contendo uma nuvem ou uma matriz de pontos Nx3.
         
         Atributos
         ---------
             file_path: arquivo original.
             pcd: objeto Open3D que representa a nuvem.
+            xyz: matriz Nx3 para manipulação direta dos pontos.
             n_clusters: número de partições usadas para dividir a nuvem.
             label: list com as etiquetas de cada ponto após clusterização.
         """
         
         self.file_path = file_path
-        self.pcd = o3d.io.read_point_cloud(file_path)
-        self.n_clusters = 0
+        
+        if file_path is not None:
+            self.pcd = o3d.io.read_point_cloud(file_path)
+            self.xyz = np.asarray(self.pcd.points)
+        elif xyz is not None:
+            self.pcd = o3d.geometry.PointCloud()
+            self.pcd.points = o3d.utility.Vector3dVector(xyz)
+            self.xyz = np.asarray(self.pcd.points)
+        else:
+            raise Exception("Você deve prover um arquivo ou uma matrix Nx3!")
+        
+        self.n_clusters = None
         self.labels = None
     
     def __str__(self):
@@ -57,6 +69,19 @@ class PointCloud:
         self.n_clusters = n_clusters
         self.labels = kmeans.labels_
     
+    def subcloud(self, label=0):
+        """
+        Retorna um subconjunto da nuvem de pontos atual como um novo objeto PointCloud.
+        Recebe o índice de particionamento a ser usado na amostragem.
+        """
+        
+        if self.labels is None:
+            raise Exception("Erro: a nuvem ainda não foi clusterizada!\nInvoque primeiro o método .kmeans() ou similar.")
+        
+        sub = self.xyz[self.labels == label]
+        
+        return PointCloud(xyz=sub)
+    
     def draw(self):
         """
         Método auxiliar que mostra a nuvem numa janela gráfica.
@@ -73,16 +98,14 @@ class PointCloud:
         """
         
         if self.labels is None:
-            print("Erro: a nuvem ainda não foi clusterizada!")
-            print("Invoque primeiro o método .kmeans() ou similar.")
-            return
+            raise Exception("Erro: a nuvem ainda não foi clusterizada!\nInvoque primeiro o método .kmeans() ou similar.")
         
         color_list = np.array(cm.get_cmap("tab10").colors)
         self.pcd.colors = o3d.utility.Vector3dVector(color_list[self.labels])
         
         title = f"Nuvem {self.file_path} particionada {self.n_clusters} vezes"
         o3d.visualization.draw_geometries([self.pcd], width=800, height=600, window_name=title)
-
+    
     def rotate(self, rotation):
         """
         Método que rotaciona a nuvem.
@@ -98,6 +121,28 @@ class PointCloud:
         """
         
         self.pcd.transform(transformation)
+    
+    def geometric_features(self):
+        """
+        Cálcula o conjunto de 8 atributos atributos geométricos descritos em Hackel et. al.
+        """
+        
+        _, s, _ = np.linalg.svd(self.xyz, full_matrices=False)
+        
+        l1 = s[0]**2
+        l2 = s[1]**2
+        l3 = s[2]**2
+        
+        f_sum = l1 + l2 + l3
+        f_omni = (l1 * l2 * l3)**(1/3)
+        f_eigent = -1 * (l1 * np.log(l1) + l2 * np.log(l2) + l3 * np.log(l3))
+        f_anisot = (l1 - l3) / l1
+        f_plan = (l2 - l3) / l1
+        f_linear = (l1 - l2) / l1
+        f_surfvar = l3 / (l1 + l2 + l3)
+        f_spheri = l3 / l1
+        
+        return np.array([f_sum, f_omni, f_eigent, f_anisot, f_plan, f_linear, f_surfvar, f_spheri])
     
 
 class Registration:

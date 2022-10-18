@@ -1,16 +1,19 @@
 import sys
 from pointy import PointCloud
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     print("ERRO! Número incorreto de parâmetros!")
-    print("USO: python3 <[str]caminho_nuvem> <[int]numero_particoes>")
+    print("USO: python3 <[str]caminho_nuvem> <[int]numero_particoes> <[int]particao_alvo>")
     sys.exit(1)
 
 cloud = PointCloud(file_path=sys.argv[1])
 n_clusters = int(sys.argv[2])
-
-print(cloud)
+label = int(sys.argv[3])
 
 cloud.kmeans(n_clusters)
-cloud.draw_clusters()
+sub = cloud.subcloud(label)
+
+print(sub)
+
+sub.draw()
 
