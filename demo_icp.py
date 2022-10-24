@@ -4,7 +4,7 @@ from pointy import Registration
 
 if len(sys.argv) != 3:
     print("ERRO! Número incorreto de parâmetros!")
-    print("USO: python3 <[str]caminho_fonte> <[str]caminho_alvo>")
+    print("USO: python3 demo_icp.py <[str]caminho_fonte> <[str]caminho_alvo>")
     sys.exit(1)
 
 source = PointCloud(file_path=sys.argv[1])

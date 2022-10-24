@@ -3,7 +3,7 @@ from pointy import PointCloud
 
 if len(sys.argv) != 3:
     print("ERRO! Número incorreto de parâmetros!")
-    print("USO: python3 <[str]caminho_nuvem> <[int]numero_particoes>")
+    print("USO: python3 demo_kmeans.py <[str]caminho_nuvem> <[int]numero_particoes>")
     sys.exit(1)
 
 cloud = PointCloud(file_path=sys.argv[1])

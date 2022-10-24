@@ -1,4 +1,7 @@
 numpy
+scipy
+pandas
 open3d
+seaborn
 matplotlib
 scikit-learn
