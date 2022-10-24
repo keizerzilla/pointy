@@ -15,14 +15,14 @@ class PointCloud:
         
         Atributos
         ---------
-            file_path: arquivo original.
+            file_path: arquivo original (caso a nuvem tenha sido carrega de um arquivo).
             pcd: objeto Open3D que representa a nuvem.
             xyz: matriz Nx3 para manipulação direta dos pontos.
             n_clusters: número de partições usadas para dividir a nuvem.
-            label: list com as etiquetas de cada ponto após clusterização.
+            labels: list com as etiquetas de cada ponto após clusterização.
         """
         
-        self.file_path = file_path
+        assert file_path is not None or xyz is not None, "O construtor deve receber um arquivo ou uma matriz!"
         
         if file_path is not None:
             self.pcd = o3d.io.read_point_cloud(file_path)
@@ -34,6 +34,7 @@ class PointCloud:
         else:
             raise Exception("Você deve prover um arquivo ou uma matrix Nx3!")
         
+        self.file_path = file_path
         self.n_clusters = None
         self.labels = None
     
@@ -47,14 +48,14 @@ class PointCloud:
         
         return f"Nuvem {self.file_path} -> {num_points} pontos"
     
-    def save(self, file_path, ascii=True):
+    def save(self, output_path, is_ascii=True):
         """
         Salva nuvem em arquivo.
         Recebe como parâmetro o caminho onde a nuvem deve ficar salva.
-        Por padrão, o formato do arquivo é o texto (ascii=True). Trocar para False salva em binário.
+        Por padrão, o formato do arquivo é o texto (is_ascii=True); trocar para False salva em binário.
         """
         
-        o3d.io.write_point_cloud(file_path, self.pcd, write_ascii=ascii)
+        o3d.io.write_point_cloud(output_path, self.pcd, write_ascii=is_ascii)
     
     def kmeans(self, n_clusters=4):
         """
@@ -121,29 +122,7 @@ class PointCloud:
         """
         
         self.pcd.transform(transformation)
-    
-    def geometric_features(self):
-        """
-        Cálcula o conjunto de 8 atributos atributos geométricos descritos em Hackel et. al.
-        """
-        
-        _, s, _ = np.linalg.svd(self.xyz, full_matrices=False)
-        
-        l1 = s[0]**2
-        l2 = s[1]**2
-        l3 = s[2]**2
-        
-        f_sum = l1 + l2 + l3
-        f_omni = (l1 * l2 * l3)**(1/3)
-        f_eigent = -1 * (l1 * np.log(l1) + l2 * np.log(l2) + l3 * np.log(l3))
-        f_anisot = (l1 - l3) / l1
-        f_plan = (l2 - l3) / l1
-        f_linear = (l1 - l2) / l1
-        f_surfvar = l3 / (l1 + l2 + l3)
-        f_spheri = l3 / l1
-        
-        return np.array([f_sum, f_omni, f_eigent, f_anisot, f_plan, f_linear, f_surfvar, f_spheri])
-    
+
 
 class Registration:
     

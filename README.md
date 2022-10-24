@@ -4,7 +4,9 @@ Pequena abstração que encapsula algumas classes da biblioteca Open3D para expe
 
 ## Dependências
 
-As bibliotecas necessárias estão listadas no arquivo `requirements.txt`. Para instala-las com um comando apenas, execute:
+Este projeto é escrito inteiramente em Python e necessita de qualquer versão igual ou superior a 3.9 para ser corretamente executado.
+
+Em termos de outras dependências fora do escopo do interpretador padrão, as bibliotecas necessárias estão listadas no arquivo `requirements.txt`. Para instala-las com um comando apenas, execute:
 
 ```
 pip3 install --upgrade -r requirements.txt
@@ -22,6 +24,10 @@ Dependendo do seu sistema operacional, o comando `pip3` pode estar indisponível
 - `demo_draw.py`: carrega uma nuvem de pontos lida via linha de comando e a exibe numa janela de visualização iterativa.
 - `demo_icp.py`: carrega duas nuvens de pontos lidas via linha de comando, executa o ICP e exibe resultado, tanto visual (janela com alvo e alinhada) quanto no terminal (matriz de transformação e RMSE).
 - `demo_kmeans.py`: carrega uma nuvem de pontos lida via linha de comando e um número de partições, então executa o k-Médias de acordo e mostra nuvem particionada.
+
+## Executando exemplos
+
+Uma vez no diretório deste repositório, você pode executar qualquer exemplo chamando o interpretador `python3` seguido do arquivo do exemplo. Cada exemplo possui uma quantidade diferente de argumentos de entrada; tente executá-los sem nenhum, assim uma mensagem de ajuda mostrará o que você precisa passar para cada programa.
 
 ## Nuvens de teste
 

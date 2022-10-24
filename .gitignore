@@ -1,3 +1,8 @@
+# Arquivos especiais do projeto
+resultados/
+
+# -----------------------------------------------------------------------------
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
