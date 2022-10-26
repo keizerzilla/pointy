@@ -28,7 +28,7 @@ target.kmeans(n_clusters_tgt)
 # gerando informações sobre o experimento: arquivos usado, pasta de resultados e nome do experimento
 src_cloud_file = Path(sys.argv[1]).stem
 tgt_cloud_file = Path(sys.argv[2]).stem
-test_name = f"{src_cloud_file}[{n_clusters_src:02d}]_vs_{tgt_cloud_file}[{n_clusters_tgt:02d}]"
+test_name = f"{src_cloud_file}_{n_clusters_src:02d}-vs-{tgt_cloud_file}_{n_clusters_tgt:02d}"
 test_folder = f"resultados/{test_name}"
 os.makedirs(test_folder, exist_ok=True)
 
@@ -39,6 +39,7 @@ print(test_name)
 dump = []
 for i in range(n_clusters_src):
     src = source.subcloud(i)
+    src.save(os.path.join(test_folder, f"{src_cloud_file}_{i:02d}-{n_clusters_src-1:02d}.ply"))
     for j in range(n_clusters_tgt):
         tgt = target.subcloud(j)
         
@@ -46,40 +47,30 @@ for i in range(n_clusters_src):
         reg.icp_point2point()
         
         # gera nuvem alinha a partir de cópia da nuvem source original (completa)
-        aligned = copy.deepcopy(source)
-        aligned.transform(reg.transformation)
+        # calcula RMSE global, ou seja, avalia o alinhamento entre as nuvens originais com a matriz de transformação do par atual
+        reg_global = Registration(source, target)
+        reg_global.coarse_registration(reg.transformation)
+        rmse_aligned = reg_global.rmse
+        aligned = reg_global.aligned
         
         # salvando subnuvens e nuvem alinhada
-        src.save(os.path.join(test_folder, f"{src_cloud_file}[{i+1:02d}|{n_clusters_src:02d}].ply"))
-        tgt.save(os.path.join(test_folder, f"{tgt_cloud_file}[{j+1:02d}|{n_clusters_tgt:02d}].ply"))
-        aligned.save(os.path.join(test_folder, f"aligned_{src_cloud_file}[{i+1:02d}|{n_clusters_src:02d}]_vs_{tgt_cloud_file}[{j+1:02d}|{n_clusters_tgt:02d}].ply"))
+        tgt.save(os.path.join(test_folder, f"{tgt_cloud_file}_{j:02d}-{n_clusters_tgt-1:02d}.ply"))
+        aligned.save(os.path.join(test_folder, f"aligned_{src_cloud_file}_{i:02d}-{n_clusters_src-1:02d}_vs_{tgt_cloud_file}-{j:02d}-{n_clusters_tgt-1:02d}.ply"))
         
-        # gerando lista com os valores gerados pelo experimento
-        src_cloud = [sys.argv[1]]
-        tgt_cloud = [sys.argv[2]]
-        num_clusters_src = [n_clusters_src]
-        num_clusters_tgt = [n_clusters_tgt]
-        src_cluster = [i]
-        tgt_cluster = [j]
-        rmse = [reg.rmse]
+        # gerando resultados do experimento atual
         matrix = list(np.ravel(reg.transformation))
-        result = src_cloud + tgt_cloud + num_clusters_src + num_clusters_tgt + src_cluster + tgt_cluster + rmse + matrix
+        result = [sys.argv[1], sys.argv[2], n_clusters_src, n_clusters_tgt, i, j, reg.has_converged, reg.rmse, rmse_aligned] + matrix
         dump.append(result)
         
-        # debug :-)
-        print(i, j, "OK!")
+        # debug
+        print(f"{i:02d} vs {j:02d} => RMSE_PART = {reg.rmse:.6f} | RMSE_GLOBAL = {rmse_aligned:.6f} | Converged? {reg.has_converged}")
 
 # formatando tabela de resultados: nomes das colunas
 t_matrix_cols = [f"t{i}" for i in range(16)]
-column_names = ["src_cloud",
-                "tgt_cloud",
-                "num_clusters_src",
-                "num_clusters_tgt",
-                "src_cluster",
-                "tgt_cluster",
-                "rmse"] + t_matrix_cols
+column_names = ["src_cloud", "tgt_cloud", "num_clusters_src", "num_clusters_tgt", "src_cluster", "tgt_cluster", "has_converged", "rmse_part", "rmse_global"]
+column_names = column_names + t_matrix_cols
 
-# formatando tabela de resultados: DataFrame
+# formatando tabela de resultados num objeto pandas.DataFrame
 df = pd.DataFrame(data=dump, columns=column_names)
 df.to_csv(os.path.join(test_folder, "results.csv"), index=None)
 

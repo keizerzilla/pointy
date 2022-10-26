@@ -146,6 +146,8 @@ class Registration:
         self.aligned = None
         self.transformation = None
         self.rmse = None
+        self.has_converged = False
+        self.threshold = 0.005
     
     def __str__(self):
         """
@@ -160,7 +162,7 @@ class Registration:
         
         return str_source + "\n" + str_target + "\n" + str_trans + "\n" + str_rmse
     
-    def icp_point2point(self, threshold=0.02):
+    def icp_point2point(self):
         """
         Método que executa o ICP ponto-a-ponto.
         Único parâmetro passado hoje é a distância máxima de correspondência (padrão: 0.02)
@@ -169,10 +171,28 @@ class Registration:
         Ao final da execução, os atributos 'transformation', 'rmse' e 'aligned' ficam disponíveis.
         """
         
-        icp_reg = o3d.pipelines.registration.registration_icp(self.source.pcd, self.target.pcd, threshold)
+        icp_reg = o3d.pipelines.registration.registration_icp(self.source.pcd, self.target.pcd, self.threshold)
         
         self.transformation = icp_reg.transformation
         self.rmse = icp_reg.inlier_rmse
+        self.has_converged = not(icp_reg.fitness == 0 and icp_reg.inlier_rmse == 0)
+        
+        aligned = copy.deepcopy(self.source)
+        aligned.transform(self.transformation)
+        
+        self.aligned = aligned
+    
+    def coarse_registration(self, trans):
+        """
+        Aplica transformação inicial numa iteração única (i.e ajuste grosseiro).
+        Recebe a matriz de tranformação 'trans' que define o ajuste grosseio.
+        """
+        
+        icp_reg = o3d.pipelines.registration.evaluate_registration(self.source.pcd, self.target.pcd, self.threshold, trans)
+        
+        self.transformation = icp_reg.transformation
+        self.rmse = icp_reg.inlier_rmse
+        self.has_converged = not(icp_reg.fitness == 0 and icp_reg.inlier_rmse == 0)
         
         aligned = copy.deepcopy(self.source)
         aligned.transform(self.transformation)

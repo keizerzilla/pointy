@@ -14,7 +14,7 @@ pip3 install --upgrade -r requirements.txt
 
 Dependendo do seu sistema operacional, o comando `pip3` pode estar indisponível em lugar de apenas `pip`.
 
-## Arquitetura
+## Classes
 
 - `PointCloud`: abstrai uma nuvem de pontos, encapsulando o objeto padrão do Open3D e adicionando outras funcionalidades, especialmente a funcionalidade de clusterização na forma do método `.kmeans()`.
 - `Registration`: encapsula a execução de um algoritmo de registro, hoje apenas o ICP ponto-a-ponto, mas pode-se expandir depois. Entrega método que facilitam a experimentação, como `.show_result()`. Armazena nativamente os resultados do registro, como a matriz de transformação, o RMSE e a nuvem já alinhada.
@@ -27,7 +27,11 @@ Dependendo do seu sistema operacional, o comando `pip3` pode estar indisponível
 
 ## Executando exemplos
 
-Uma vez no diretório deste repositório, você pode executar qualquer exemplo chamando o interpretador `python3` seguido do arquivo do exemplo. Cada exemplo possui uma quantidade diferente de argumentos de entrada; tente executá-los sem nenhum, assim uma mensagem de ajuda mostrará o que você precisa passar para cada programa.
+Uma vez no diretório deste repositório, você pode executar qualquer exemplo chamando o interpretador `python3` seguido do arquivo do exemplo. Cada exemplo possui uma quantidade diferente de argumentos de entrada; tente executá-los sem nenhum, assim uma mensagem de ajuda mostrará o que você precisa passar para cada programa. Exemplo:
+
+```
+python3 demo_draw.py bunny/bun000.ply
+```
 
 ## Nuvens de teste
 
