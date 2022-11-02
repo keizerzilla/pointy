@@ -64,11 +64,33 @@ class PointCloud:
         Após execução, o atributo 'labels' é atualizado com as etiquetas ponto a ponto.
         """
         
+        if n_clusters <= 0:
+            raise Exception(f"É necessário pelo menos um segmento, mas {n_clusters} foram passados!")
+        
         kmeans = KMeans(n_clusters=n_clusters, random_state=0)
         kmeans.fit(self.pcd.points)
         
         self.n_clusters = n_clusters
         self.labels = kmeans.labels_
+    
+    def axial_segmentation(self, axis, n_clusters=10):
+        """ Particiona a nuvem ao longo de um dos eixos canônicos
+        O parâmetro 'axis' pode ter um dos seguintes valores:
+            {0 : x, 1 : y, 2 : z}
+        """
+        
+        if n_clusters <= 0:
+            raise Exception(f"É necessário pelo menos um segmento, mas {n_clusters} foram passados!")
+        
+        if axis not in [0, 1, 2]:
+            raise Exception(f"'axis' precisa ser um valor dentre [0, 1, 2]!")
+        
+        self.n_clusters = n_clusters
+        self.xyz = self.xyz[self.xyz[:, axis].argsort()]
+        self.pcd.points = o3d.utility.Vector3dVector(self.xyz)
+        
+        ppc = int(np.ceil(self.xyz.shape[0] / n_clusters))
+        self.labels = np.repeat(range(n_clusters), ppc)[:self.xyz.shape[0]]
     
     def subcloud(self, label=0):
         """
@@ -83,14 +105,28 @@ class PointCloud:
         
         return PointCloud(xyz=sub)
     
+    def aligned_mesh_frame(self):
+        """ Cria uma malha que desenha uma referência de eixos XYZ em posição relativa à nuvem.
+        """
+        
+        box = self.pcd.get_axis_aligned_bounding_box()
+        frame_size = box.get_max_extent()*0.2
+        frame_origin = np.mean(self.xyz, axis=0) + box.get_min_bound()
+        
+        mesh_frame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=frame_size, origin=frame_origin)
+        
+        return mesh_frame
+    
     def draw(self):
         """
         Método auxiliar que mostra a nuvem numa janela gráfica.
         A janela já vem com iteratividade padrão: mouse rotaciona, +- troca tamanho dos pontos, etc.
         """
         
+        mesh_frame = self.aligned_mesh_frame()
+        
         title = f"Nuvem {self.file_path}"
-        o3d.visualization.draw_geometries([self.pcd], width=800, height=600, window_name=title)
+        o3d.visualization.draw_geometries([self.pcd, mesh_frame], width=800, height=600, window_name=title)
     
     def draw_clusters(self):
         """
@@ -104,8 +140,10 @@ class PointCloud:
         color_list = np.array(cm.get_cmap("tab10").colors)
         self.pcd.colors = o3d.utility.Vector3dVector(color_list[self.labels])
         
+        mesh_frame = self.aligned_mesh_frame()
+        
         title = f"Nuvem {self.file_path} particionada {self.n_clusters} vezes"
-        o3d.visualization.draw_geometries([self.pcd], width=800, height=600, window_name=title)
+        o3d.visualization.draw_geometries([self.pcd, mesh_frame], width=800, height=600, window_name=title)
     
     def rotate(self, rotation):
         """
@@ -182,13 +220,13 @@ class Registration:
         
         self.aligned = aligned
     
-    def coarse_registration(self, trans):
+    def coarse_registration(self, transformation):
         """
         Aplica transformação inicial numa iteração única (i.e ajuste grosseiro).
-        Recebe a matriz de tranformação 'trans' que define o ajuste grosseio.
+        Recebe a matriz de tranformação 'transformation' que define o ajuste grosseio.
         """
         
-        icp_reg = o3d.pipelines.registration.evaluate_registration(self.source.pcd, self.target.pcd, self.threshold, trans)
+        icp_reg = o3d.pipelines.registration.evaluate_registration(self.source.pcd, self.target.pcd, self.threshold, transformation)
         
         self.transformation = icp_reg.transformation
         self.rmse = icp_reg.inlier_rmse
