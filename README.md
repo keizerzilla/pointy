@@ -21,16 +21,16 @@ Dependendo do seu sistema operacional, o comando `pip3` pode estar indisponível
 
 ## Exemplos
 
-- `demo_draw.py`: carrega uma nuvem de pontos lida via linha de comando e a exibe numa janela de visualização iterativa.
-- `demo_icp.py`: carrega duas nuvens de pontos lidas via linha de comando, executa o ICP e exibe resultado, tanto visual (janela com alvo e alinhada) quanto no terminal (matriz de transformação e RMSE).
-- `demo_kmeans.py`: carrega uma nuvem de pontos lida via linha de comando e um número de partições, então executa o k-Médias de acordo e mostra nuvem particionada.
+- `draw.py`: carrega uma nuvem de pontos lida via linha de comando e a exibe numa janela de visualização iterativa.
+- `icp.py`: carrega duas nuvens de pontos lidas via linha de comando, executa o ICP e exibe resultado, tanto visual (janela com alvo e alinhada) quanto no terminal (matriz de transformação e RMSE).
+- `kmeans.py`: carrega uma nuvem de pontos lida via linha de comando e um número de partições, então executa o k-Médias de acordo e mostra nuvem particionada.
 
 ## Executando exemplos
 
 Uma vez no diretório deste repositório, você pode executar qualquer exemplo chamando o interpretador `python3` seguido do arquivo do exemplo. Cada exemplo possui uma quantidade diferente de argumentos de entrada; tente executá-los sem nenhum, assim uma mensagem de ajuda mostrará o que você precisa passar para cada programa. Exemplo:
 
 ```
-python3 demo_draw.py bunny/bun000.ply
+python3 draw.py bunny/bun000.ply
 ```
 
 ## Nuvens de teste
