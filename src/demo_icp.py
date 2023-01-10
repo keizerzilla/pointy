@@ -1,6 +1,6 @@
 import sys
-from pointy import PointCloud
-from pointy import Registration
+from pointy.pointy import PointCloud
+from pointy.pointy import Registration
 
 if len(sys.argv) != 3:
     print("ERRO! Número incorreto de parâmetros!")

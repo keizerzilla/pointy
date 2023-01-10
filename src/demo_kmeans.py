@@ -1,5 +1,5 @@
 import sys
-from pointy import PointCloud
+from pointy.pointy import PointCloud
 
 if len(sys.argv) != 3:
     print("ERRO! Número incorreto de parâmetros!")

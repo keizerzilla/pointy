@@ -4,8 +4,8 @@ import copy
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from pointy import PointCloud
-from pointy import Registration
+from pointy.pointy import PointCloud
+from pointy.pointy import Registration
 
 # checando número correto de argumentos de linha de comando
 if len(sys.argv) != 5:

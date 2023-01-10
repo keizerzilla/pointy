@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import open3d as o3d
 from matplotlib import cm
-from pointy import PointCloud
+from pointy.pointy import PointCloud
 
 if len(sys.argv) < 2:
     print("ERRO! Número incorreto de parâmetros!")

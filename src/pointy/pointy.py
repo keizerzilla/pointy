@@ -199,6 +199,12 @@ class Registration:
         
         self.aligned = aligned
     
+    def ups(self):
+        """
+        """
+        
+        pass
+    
     def show_result(self):
         """
         Método auxiliar que mostra resultado do alinhamento.
